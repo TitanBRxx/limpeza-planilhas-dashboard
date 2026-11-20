@@ -218,3 +218,24 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+
+# Segredos e credenciais
+.env
+.env.*
+*.json
+token.json
+credentials.json
+service_account*.json
+
+# Dados internos e arquivos locais
+data/raw/
+data/processed/
+*.xlsx
+*.xls
+*.gsheet
+*.parquet
+
+# Ambiente e sistema
+.DS_Store
+Thumbs.db
