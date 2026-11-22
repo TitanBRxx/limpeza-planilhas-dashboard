@@ -1,4 +1,4 @@
-# Limpeza e Padronização Automáticas de Planilhas com Python Para Geração de Dashboards Mensalmente.
+# Padronização Automática de Dados Reais com Python Para Geração de Dashboards Mensais.
 
 Projeto de preparação de dados reais de inventário de equipamentos audiovisuais, utilizando Python, Pandas, Google Sheets, com disponibilização dos dados tratados para análise no Looker Studio.
 
