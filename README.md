@@ -64,8 +64,6 @@ O script atual foi preparado para o Google Colab, pois utiliza a autenticação 
 4. Execute o script com uma conta que tenha acesso à origem e permissão para criar arquivos na pasta de destino.
 5. Confira os totais de entrada e saída e valide a planilha criada antes de atualizar o dashboard.
 
-**Importante:** não coloque credenciais, IDs internos ou dados reais no GitHub. O arquivo de exemplo em `data/` contém valores inteiramente fictícios.
-
 ## Estrutura e documentação dos dados
 
 - [Mapeamento das planilhas](docs/01_mapeamento_planilhas.md): visão geral inicial das fontes e problemas estruturais.
