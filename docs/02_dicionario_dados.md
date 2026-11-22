@@ -59,7 +59,3 @@ Estas entidades são hipóteses de modelagem, não um modelo aprovado:
 - **Kit:** agrupamento de equipamentos, caso a regra operacional confirme essa relação.
 
 A cardinalidade entre equipamento, kit, proprietário e categoria deve ser validada antes da implementação física.
-
-## Confidencialidade
-
-Este repositório é público. Não inserir números de série reais, nomes de clientes, IDs/URLs de planilhas internas, valores comerciais reais, credenciais ou outros dados confidenciais. Utilize apenas dados fictícios ou expressamente autorizados.
