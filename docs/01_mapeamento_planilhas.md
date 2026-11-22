@@ -6,10 +6,10 @@ Registrar a visão geral das fontes de inventário que alimentam o processo de p
 
 ## Visão geral conhecida
 
-- A operação utiliza aproximadamente **20 planilhas Google Sheets**.
-- Cada arquivo pode conter cerca de duas tabelas, mas essa distribuição ainda precisa ser conferida.
-- O conteúdo é principalmente relacionado ao **inventário de equipamentos audiovisuais**.
-- Entre as categorias já identificadas estão lentes, baterias, monitores, comandos de foco e matteboxes.
+- A operação utiliza **7 planilhas Google Sheets**.
+- Cada arquivo pode conter cerca de 3 a 5 tabelas.
+- O conteúdo é do **inventário de equipamentos audiovisuais**.
+- Entre as categorias já identificadas estão lentes, baterias, monitores, comandos de foco, matteboxes, suporte, luz e rádio comunicadores.
 - A estrutura e o nível de padronização variam entre as fontes.
 - O projeto trata dados de inventário. Dados transacionais de reservas e locações não fazem parte do escopo atual.
 
