@@ -2,7 +2,7 @@
 
 Projeto de preparação de dados de inventário de equipamentos audiovisuais, utilizando Python, Pandas e Google Sheets, com disponibilização dos dados tratados para análise no Looker Studio.
 
-O projeto surgiu de uma necessidade real de melhorar a estrutura e a consistência de planilhas de inventário. O repositório é público e, por isso, contém apenas documentação e exemplos fictícios: não publique dados internos, números de série, IDs de planilhas, credenciais ou valores comerciais sem autorização.
+O projeto surgiu de uma necessidade real de melhorar a estrutura e a consistência de planilhas de inventário. O repositório é público e, por isso, contém apenas documentação e exemplos fictícios.
 
 ## Objetivo
 
