@@ -10,7 +10,7 @@ Documentar os campos utilizados na preparação dos dados e estabelecer regras d
 |---|---|---|---|---|
 | `Marca` | Marca do equipamento | Texto | Remover espaços excedentes e padronizar capitalização | Confirmar exceções de grafia e marcas com siglas |
 | `Proprietário` | Proprietário associado ao item | Texto | Remover espaços excedentes e padronizar capitalização | Confirmar domínio de valores |
-| `Kit` | Identificação ou descrição do kit | Texto | Remover espaços excedentes e converter para minúsculas | Filtros de exclusão são específicos da fonte piloto |
+| `Kit` | Identificação do kit | Texto | Remover espaços excedentes e converter para minúsculas | Filtros de exclusão são específicos da fonte|
 | `Lente` | Descrição/modelo da lente | Texto | Remover espaços excedentes e converter para minúsculas | A descrição deve conter somente informação própria do campo |
 | `Valor` | Valor registrado para o item | Numérico decimal | Converter representação monetária brasileira para número | Definir política para valores ausentes e inválidos |
 
