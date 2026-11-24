@@ -2,60 +2,60 @@
 
 ## Objetivo
 
-Documentar os campos utilizados na preparação dos dados e estabelecer regras de interpretação. O dicionário abaixo começa pela fonte piloto de lentes; os campos das demais categorias devem ser acrescentados somente após inspeção das respectivas planilhas.
+Definir o contrato de estrutura, tipagem SQL e regras de higienização (ETL) aplicadas às planilhas brutas antes da carga no banco de dados relacional.
 
-## Campos da fonte piloto — lentes
+> **Nota de confidencialidade:** Todos os exemplos e valores abaixo são 100% fictícios e ilustrativos. Nenhum dado comercial real, número de série ou nome interno da operação foi utilizado.
 
-| Campo | Significado conhecido | Tipo esperado na saída | Regra inicial | Observações |
-|---|---|---|---|---|
-| `Marca` | Marca do equipamento | Texto | Remover espaços excedentes e padronizar capitalização | Confirmar exceções de grafia e marcas com siglas |
-| `Proprietário` | Proprietário associado ao item | Texto | Remover espaços excedentes e padronizar capitalização | Confirmar domínio de valores |
-| `Kit` | Identificação do kit | Texto | Remover espaços excedentes e converter para minúsculas | Filtros de exclusão são específicos da fonte|
-| `Lente` | Descrição/modelo da lente | Texto | Remover espaços excedentes e converter para minúsculas | A descrição deve conter somente informação própria do campo |
-| `Valor` | Valor registrado para o item | Numérico decimal | Converter representação monetária brasileira para número | Definir política para valores ausentes e inválidos |
+## 1. Estrutura de Campos e Tipagem SQL (Piloto: Lentes)
 
-## Outros atributos identificados no levantamento
+A modelagem separa atributos comuns a todo o inventário (tabela mãe `equipamento`) e atributos técnicos exclusivos (tabela filha `lente`).
 
-Os campos abaixo apareceram no contexto das planilhas de inventário, mas ainda precisam ser confirmados quanto ao nome exato, significado, domínio e presença em cada fonte.
+### Identificação (Tabela `equipamento`)
+| Coluna (SQL) | Tipo SQL | Regra | O que extrair da planilha | Exemplo fictício |
+| :--- | :--- | :---: | :--- | :--- |
+| `id_equipamento` | `VARCHAR(20)` | `PK / NOT NULL` | Código único gerado no pipeline (garante chave para itens sem série) | `LNT-001` |
+| `numero_serie` | `VARCHAR(50)` | `NULL` | Identificação física do item (opcional, pois nem todo item possui) | `SN-0001` |
+| `marca` | `VARCHAR(50)` | `NOT NULL` | Fabricante padronizado | `ARRI` |
+| `kit` | `VARCHAR(100)` | `NULL` | Nome do jogo/conjunto ao qual pertence (`NULL` se for avulsa) | `Signature Prime` |
+| `modelo` | `VARCHAR(100)` | `NOT NULL` | Nome específico da lente (coluna *Lente*) | `18mm Distagon T1.3` |
 
-| Atributo | Aplicação conhecida | Validação pendente |
-|---|---|---|
-| Número de série | Identificação individual de equipamentos | Formato, unicidade e política de confidencialidade |
-| Diâmetro frontal | Característica de lentes, relevante para compatibilidade com acessórios | Unidade, tipo numérico e valores válidos |
-| Kit | Agrupamento de itens | Se representa um agrupamento físico, comercial ou ambos |
-| Proprietário | Identificação da propriedade do item | Domínio de valores e relacionamento com cadastro próprio |
-| Marca | Fabricante/marca do item | Cadastro padronizado e tratamento de siglas |
-| Valor | Informação monetária do inventário | Moeda, data de referência e significado do valor |
+### Ficha Técnica (Tabela `lente`)
+| Coluna (SQL) | Tipo SQL | Regra | O que extrair da planilha | Exemplo fictício |
+| :--- | :--- | :---: | :--- | :--- |
+| `foco_minimo_mm` | `INT` | `NULL` | Distância mínima de foco (apenas número em mm) | `350` |
+| `diametro_frontal_mm` | `INT` | `NOT NULL` | Medida frontal em mm (chave de encaixe com mattebox) | `95` |
 
-## Regras de qualidade propostas
+### Patrimônio (Tabela `equipamento`)
+| Coluna (SQL) | Tipo SQL | Regra | O que extrair da planilha | Exemplo fictício |
+| :--- | :--- | :---: | :--- | :--- |
+| `valor_reposicao` | `DECIMAL(10,2)` | `NOT NULL` | Valor unitário de inventário limpo | `50000.00` |
+| `proprietario` | `VARCHAR(100)` | `NOT NULL` | Dono do ativo (casa ou parceiro consignado) | `Parceiro A` |
 
-1. **Texto:** remover espaços no início/fim e reduzir sequências de espaços internos.
-2. **Capitalização:** aplicar regra por coluna, sem assumir que `title()` é adequada a siglas, marcas ou códigos.
-3. **Valores monetários:** interpretar o padrão brasileiro (por exemplo, `1.234,56`) e converter para número decimal.
-4. **Valores ausentes:** não substituir automaticamente todos os campos ausentes por zero. Zero deve representar um valor real; ausência deve continuar identificável, salvo regra de negócio aprovada.
-5. **Identificadores:** números de série e códigos devem ser tratados como texto, preservando zeros à esquerda.
-6. **Filtros:** manter listas de exclusão específicas por fonte e documentar sua justificativa.
+## 2. Regras de Negócio e Higienização (ETL)
 
-## Exemplo de regra de compatibilidade: lente × mattebox
+1. **Filtro de escopo:** Remover linhas de *step-up rings*, adaptadores de mount, tampas e suportes misturados na aba de lentes.
+2. **Geração de ID:** Criar `id_equipamento` sequencial no pipeline Python para permitir carga segura de itens sem `numero_serie`.
+3. **Limpeza textual:** Aplicar `strip()` para remover espaços nas extremidades, eliminar espaços duplos e padronizar o nome das marcas.
+4. **Conversão de medidas:** Extrair apenas os dígitos de `foco_minimo_mm` e `diametro_frontal_mm`, convertendo para inteiro (`INT`).
+5. **Conversão monetária:** Remover `"R$"`, pontos de milhar e substituir vírgula por ponto antes de converter para `DECIMAL(10,2)`.
+6. **Tratamento de nulos (`NaN`):** Campos opcionais vazios assumem `None`/`NULL` no banco (e `""` ou `"Não informado"` caso haja exportação auxiliar via `gspread`).
+7. **Regra de compatibilidade (Lente × Mattebox):** Lentes com `diametro_frontal_mm` igual ao encaixe traseiro (`back`) do mattebox possuem encaixe direto; diâmetros menores exigem anel redutor.
 
-O diâmetro frontal da lente pode ser utilizado para apoiar a identificação de matteboxes compatíveis. Para transformar essa ideia em regra de dados, ainda é necessário validar:
+## 3. Exemplo De / Para (dados fictícios)
 
-- a unidade e o significado do diâmetro informado na lente;
-- qual dimensão da mattebox representa a interface compatível;
-- se existem anéis/adaptadores que alteram a compatibilidade;
-- como representar múltiplas opções compatíveis e exceções.
+| Campo | Entrada bruta (Planilha) | Saída tratada (Python → SQL) |
+| :--- | :--- | :--- |
+| `id_equipamento` | *(Gerado no pipeline)* | `LNT-001` |
+| `numero_serie` | *(célula vazia)* | `NULL` |
+| `marca` | `"  arri "` | `"ARRI"` |
+| `kit` | `"Signature Prime  "` | `"Signature Prime"` |
+| `modelo` | `"18mm Distagon  T1.3"` | `"18mm Distagon T1.3"` |
+| `foco_minimo_mm` | `"350 mm"` | `350` |
+| `diametro_frontal_mm` | `"95mm"` | `95` |
+| `valor_reposicao` | `"R$ 50.000,00"` | `50000.00` |
+| `proprietario` | `"Parceiro A"` | `"Parceiro A"` |
+| *(Item fora de escopo)* | `"Anel Step-Up 82-95mm"` | *(Descartado no filtro de lentes)* |
 
-**Não implementar uma associação automática apenas comparando números antes de validar essas regras com a equipe técnica.**
+## Status
 
-## Entidades conceituais candidatas
-
-Estas entidades são hipóteses de modelagem, não um modelo aprovado:
-
-- **Equipamento:** cadastro comum de itens inventariados.
-- **Lente:** atributos específicos de lentes, como diâmetro frontal.
-- **Câmera:** atributos específicos de câmeras.
-- **Categoria:** classificação do tipo de equipamento.
-- **Proprietário:** cadastro de proprietários, se houver necessidade de normalização.
-- **Kit:** agrupamento de equipamentos, caso a regra operacional confirme essa relação.
-
-A cardinalidade entre equipamento, kit, proprietário e categoria deve ser validada antes da implementação física.
+*Concluído para o piloto de Lentes.* Estrutura pronta para orientar o script ETL (`src/`) e a criação das tabelas relacionais (`sql/`), com expansão prevista para as demais categorias mapeadas.
